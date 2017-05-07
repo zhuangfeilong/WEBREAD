@@ -40,12 +40,12 @@
   }
   var Win = $(window);
   var Doc = $(document);
-  var readModel;
+  var readerModel;
   var readUI;
   var RootContainer = $('#fiction_container');
   var FontSize = 14;
 
-  function ReadModel(id_, cid_, onChange_) {
+  function ReaderModel(id_, cid_, onChange_) {
     // 实现阅读器相关数据交互请求的方法
     var ChapterTotal;
     var Title = "";
@@ -215,7 +215,7 @@
     var NightMode = false;
     var readerUIFrame = ReadBaseFrame(RootContainer);
 
-    readModel = ReadModel(Fiction_id || 13359, Chapter_id, function (data) {
+    readerModel = ReaderModel(Fiction_id || 13359, Chapter_id, function (data) {
       readerUIFrame(data);
       Dom.bottom_tool_bar.show();
       setTimeout(function () {
@@ -224,17 +224,113 @@
       }, 20);
     });
 
+    var EventHanlder = function () {
+      // 绑定交互事件
+      $('#action_mid').click(function () {
+        if (Dom.topNav.css('display') == "none") {
+          Dom.topNav.show();
+          Dom.bottomNav.show();
+        } else {
+          Dom.topNav.hide();
+          Dom.bottomNav.hide();
+          $('.nav-pannel').hide();
+          $('.nav-pannel-bk').hide();
+        };
+      });
+      Win.scroll(function () {
+        Dom.topNav.hide();
+        Dom.bottomNav.hide();
+        $('.nav-pannel').hide();
+        $('.nav-pannel-bk').hide();
+      });
+      $('#font_button').click(function () {
+        if ($('.nav-pannel-bk').css('display') == 'none') {
+          $('.nav-pannel').show();
+          $('.nav-pannel-bk').show();
+          Dom.fontButton.addClass('current')
+        }
+        else {
+          $('.nav-pannel').hide();
+          $('.nav-pannel-bk').hide();
+          Dom.fontButton.removeClass('current')
+        }
+      });
+
+      $('#big_font').click(function () {
+        // 放大字体
+        if (FontSize < 18) {
+          FontSize = 18;
+        }
+        if (FontSize >= 18) {
+          FontSize++;
+        }
+        if (FontSize > 25) {
+          FontSize = 25;
+        }
+        RootContainer.css('font-size', FontSize);
+        Util.StorageSetter('font-size', FontSize);
+      });
+      $('#small_font').click(function () {
+        // 缩小字体
+        if (FontSize > 12) {
+          FontSize = 12;
+        }
+        RootContainer.css('font-size', FontSize);
+        Util.StorageSetter('font-size', FontSize);
+      });
+      $('#normal_font').click(function () {
+        // 还原标准字体
+        if (!(FontSize = 14)) {
+          FontSize = 14;
+        }
+        RootContainer.css('font-size', FontSize);
+        Util.StorageSetter('font-size', FontSize);
+      });
+      Dom.dayNightSwitchButton.click(function () {
+        // 切换夜间模式和正常模式时背景色的敏感程度
+        if ($('#day_icon').css('display') == 'none') {
+          $('#day_icon').show();
+          $('#night_icon').hide();
+          $('#fiction_container').css('background', '#000').css('color', '#f7ff16');
+        }
+        else {
+          $('#day_icon').hide();
+          $('#night_icon').show();
+          $('#fiction_container').css('background', '#F4F4CB').css('color', '#000');
+        }
+      });
+      Dom.changeBackGround.click(function () {
+        // 切換背景色
+        $(this).addClass('newColor');
+        var newBackGround = $('.newColor').css('background-color');
+        $('body').css('background-color', '');
+        $('div.m-read-content').css('background-color', newBackGround);
+        $(this).removeClass('newColor');
+      });
+      $('#prev_button').click(function () {
+        // 向上翻页，获得上一章节
+        readerModel.prevChapter(function () {
+          readUI(data);
+        });
+      });
+      $('#next_button').click(function () {
+        // 向下翻页，获得下一章节
+        readerModel.nextChapter(function () {
+          readUI(data);
+        });
+      });
+    }
 
     readUI = ReadBaseFrame();
-    readModel.init();
+    readerModel.init();
     EventHanlder();
 
   }
-  // function ReadModel(id_, cid_, onChange_) {function main() {
+  // function ReaderModel(id_, cid_, onChange_) {function main() {
   //   // 项目的入口函数
-  //   readModel = ReadModel();
+  //   readerModel = ReaderModel();
   //   readUI = ReadBaseFrame();
-  //   readModel.init(function (data) {
+  //   readerModel.init(function (data) {
   //     readUI(data);
   //   });
   //   EventHanlder();
@@ -242,102 +338,6 @@
   // }
 
 
-  function EventHanlder() {
-    // 绑定交互事件
-    $('#action_mid').click(function () {
-      if (Dom.topNav.css('display') == "none") {
-        Dom.topNav.show();
-        Dom.bottomNav.show();
-      } else {
-        Dom.topNav.hide();
-        Dom.bottomNav.hide();
-        $('.nav-pannel').hide();
-        $('.nav-pannel-bk').hide();
-      };
-    });
-    Win.scroll(function () {
-      Dom.topNav.hide();
-      Dom.bottomNav.hide();
-      $('.nav-pannel').hide();
-      $('.nav-pannel-bk').hide();
-    });
-    $('#font_button').click(function () {
-      if ($('.nav-pannel-bk').css('display') == 'none') {
-        $('.nav-pannel').show();
-        $('.nav-pannel-bk').show();
-        Dom.fontButton.addClass('current')
-      }
-      else {
-        $('.nav-pannel').hide();
-        $('.nav-pannel-bk').hide();
-        Dom.fontButton.removeClass('current')
-      }
-    });
-
-    $('#big_font').click(function () {
-      // 放大字体
-      if (FontSize < 18) {
-        FontSize = 18;
-      }
-      if (FontSize >= 18) {
-        FontSize++;
-      }
-      if (FontSize > 25) {
-        FontSize = 25;
-      }
-      RootContainer.css('font-size', FontSize);
-      Util.StorageSetter('font-size', FontSize);
-    });
-    $('#small_font').click(function () {
-      // 缩小字体
-      if (FontSize > 12) {
-        FontSize = 12;
-      }
-      RootContainer.css('font-size', FontSize);
-      Util.StorageSetter('font-size', FontSize);
-    });
-    $('#normal_font').click(function () {
-      // 还原标准字体
-      if (!(FontSize = 14)) {
-        FontSize = 14;
-      }
-      RootContainer.css('font-size', FontSize);
-      Util.StorageSetter('font-size', FontSize);
-    });
-    Dom.dayNightSwitchButton.click(function () {
-      // 切换夜间模式和正常模式时背景色的敏感程度
-      if ($('#day_icon').css('display') == 'none') {
-        $('#day_icon').show();
-        $('#night_icon').hide();
-        $('#fiction_container').css('background', '#000').css('color', '#f7ff16');
-      }
-      else {
-        $('#day_icon').hide();
-        $('#night_icon').show();
-        $('#fiction_container').css('background', '#F4F4CB').css('color', '#000');
-      }
-    });
-    Dom.changeBackGround.click(function () {
-      // 切換背景色
-      $(this).addClass('newColor');
-      var newBackGround = $('.newColor').css('background-color');
-      $('body').css('background-color', '');
-      $('div.m-read-content').css('background-color', newBackGround);
-      $(this).removeClass('newColor');
-    });
-    $('#prev_button').click(function () {
-      // 向上翻页，获得上一章节
-      readModel.prevChapter(function () {
-        readUI(data);
-      });
-    });
-    $('#next_button').click(function () {
-      // 向下翻页，获得下一章节
-      readModel.nextChapter(function () {
-        readUI(data);
-      });
-    });
-  }
 
 
 

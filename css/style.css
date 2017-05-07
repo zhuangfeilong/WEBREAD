@@ -255,4 +255,25 @@ div.m-read-content p {
   color: #1A7BBA;
   z-index: 199999
 }
+.book-list {
+  position: fixed;
+  bottom: 70px;
+  height: 200px;
+  background: #1A7BBA;
+  width: 50%;
+  opacity: 0.9;
+  z-index: 100;
+  margin: 0 auto;
+  border-radius: 10px;
+  text-align: center;
+}
+.view-list .chapter-name {
+  font-size: 20px;
+  height: 40px;
+  margin: 5px auto;
+  line-height: 32px;
+  border-radius: 8px;
+  border: 1px solid #878782;
+  top: 2px;
+}
 
